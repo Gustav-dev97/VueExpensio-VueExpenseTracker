@@ -1,2 +1,344 @@
 # VueExpensio-VueExpenseTracker
 O VuExpensio é um aplicativo de gerenciamento de despesas e receitas desenvolvido com Vue.js. Ele permite que os usuários adicionem, editem e excluam transações, visualizem um resumo financeiro e exportem os dados para CSV ou PDF.
+
+-----------------------------------------------------------------------------------
+
+# Estrutura do Projeto
+
+O projeto é composto por vários componentes Vue.js, cada um responsável por uma parte específica da funcionalidade do aplicativo. Abaixo está uma visão geral dos principais componentes e suas responsabilidades:
+
+-----------------------------------------------------------------------------------
+
+## 1. **App.vue**
+O arquivo `App.vue` é o componente principal do aplicativo. Ele gerencia o estado global, incluindo a lista de transações, filtros, modais, e a lógica de exportação de dados.
+
+### Código do App.vue
+
+    <template>
+      <Loader v-if="isLoading" />
+      <Header />
+      <div class="container">
+        <button @click="exportToCSV" class="export-btn">{{ t('app.exportCSV') }} <v-icon name="bi-download" scale="1" /></button>
+        <button @click="generatePDF" class="export-btn">{{ t('app.generatePDF') }} <v-icon name="bi-download" scale="1" /></button>
+        <div class="filter-container">
+          <PeriodFilter ref="periodFilter" :transactions="transactions" @update:filteredTransactions="updateFilteredTransactions" />
+          <Filters :transactions="filteredTransactions" @update:filteredTransactions="updateFilteredTransactions" :isVisible="isFiltersVisible" />
+        </div>
+        <Dashboard :transactions="filteredTransactions" />
+        <ExpenseChart :transactions="filteredTransactions" />
+        <TransactionList :transactions="filteredTransactions" @transactionDeleted="handleTransactionDeleted" @transactionEdited="handleTransactionEdit" @editButtonClicked="resetPeriodFilter" />
+        <AddTransaction @transactionSubmitted="handleTransactionSubmitted" @modalOpened="resetPeriodFilter" />
+        <EditTransaction v-if="isEditModalVisible" :transaction="editingTransaction" :isVisible="isEditModalVisible" @transactionUpdated="handleTransactionUpdated" @close="closeEditModal" />
+        <Calculator />
+        <ConsentBanner ref="consentBannerRef" />
+      </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <p>{{ t('footer.copyright') }}</p>
+      <a href="#" @click.prevent="openPrivacyModal">{{ t('footer.privacyPolicy') }}</a>
+    </footer>
+
+      <!-- Modal de Política de Privacidade -->
+      <div v-if="isPrivacyModalVisible" class="modal-overlay" @click="closePrivacyModal">
+        <div class="modal" @click.stop>
+          <h3>{{ t('footer.privacyPolicy') }}</h3>
+          <p>{{ t('footer.privacyText') }}</p>
+          <button class="btn-delete" @click="deleteAllData">{{ t('footer.deleteAllData') }}</button>
+          <button class="btn-close" @click="closePrivacyModal">{{ t('footer.close') }}</button>
+        </div>
+      </div>
+    </template>
+
+-----------------------------------------------------------------------------------
+
+# 2. Header.vue
+O componente Header.vue é responsável pelo cabeçalho do aplicativo, que inclui o título e um seletor de idioma.
+
+### Código do Header.vue
+
+    <template>
+      <header class="header">
+        <h2 @click="scrollToTop">{{ $t('header.title') }}</h2>
+        <div class="language-dropdown">
+          <button class="language-button" @click="toggleDropdown">
+            {{ selectedLanguage }}
+          </button>
+          <ul v-if="isDropdownOpen" class="dropdown-menu">
+            <li @click="changeLanguage('pt-BR')">PT-BR</li>
+            <li @click="changeLanguage('en')">ENG</li>
+          </ul>
+        </div>
+      </header>
+    </template>
+
+-----------------------------------------------------------------------------------
+
+# 3. Dashboard.vue
+O componente Dashboard.vue exibe um resumo financeiro, incluindo receitas totais, despesas totais e saldo líquido.
+
+### Código do Dashboard.vue
+
+    <template>
+      <div class="dashboard">
+        <div class="dashboard-item">
+          <h4>{{ $t('dashboard.totalIncome') }}</h4>
+          <p class="money plus">+${{ totalIncome }}</p>
+        </div>
+        <div class="dashboard-item">
+          <h4>{{ $t('dashboard.totalExpenses') }}</h4>
+          <p class="money minus">-${{ totalExpenses }}</p>
+        </div>
+        <div class="dashboard-item">
+          <h4>{{ $t('dashboard.netBalance') }}</h4>
+          <p :class="netBalance >= 0 ? 'money plus' : 'money minus'">${{ netBalance }}</p>
+        </div>
+      </div>
+    </template>
+
+-----------------------------------------------------------------------------------
+
+# 4. ExpenseChart.vue
+O componente ExpenseChart.vue exibe gráficos de barras e de pizza para visualizar as transações.
+
+### Código do ExpenseChart.vue
+
+    <template>
+      <div class="charts-wrapper">
+        <div class="chart-container">
+          <canvas ref="barChartCanvas"></canvas>
+        </div>
+        <div class="chart-container">
+          <canvas ref="pieChartCanvas"></canvas>
+        </div>
+      </div>
+    </template>
+
+-----------------------------------------------------------------------------------
+
+# 5. TransactionList.vue
+O componente TransactionList.vue lista todas as transações, permitindo ao usuário editar ou excluir cada uma.
+
+### Código do TransactionList.vue
+
+    <template>
+      <h3 class="transactions-title">{{ $t('transactionList.title') }}</h3>
+      <ul id="list" class="list">
+        <li v-for="transaction in transactions" :key="transaction.id" :class="transaction.amount < 0 ? 'minus' : 'plus'">
+          <span class="text">{{ transaction.text }}</span>
+          <div class="center-content">
+            <span :class="getAmountClass(transaction.amount)" class="amount">${{ transaction.amount }}</span>
+            <small class="date">{{ formatDate(transaction.date) }}</small>
+          </div>
+          <div class="actions">
+            <button @click="editTransaction(transaction)" class="edit-btn">
+              <v-icon name="md-modeeditoutline-outlined" scale="1" />
+            </button>
+            <button @click="deleteTransaction(transaction.id)" class="delete-btn">x</button>
+          </div>
+        </li>
+      </ul>
+    </template>
+
+-----------------------------------------------------------------------------------
+
+# 6. AddTransaction.vue
+O componente AddTransaction.vue permite ao usuário adicionar uma nova transação.
+
+### Código do AddTransaction.vue
+
+    <template>
+      <button @click="openModal" class="add-transaction-btn">
+        <v-icon name="md-add-outlined" scale="1.25" /> {{ $t('addTransaction.addButton') }}
+      </button>
+
+    <div v-if="isModalVisible" class="modal-overlay" @click="closeModal">
+      <div class="modal" @click.stop>
+        <h3>{{ $t('addTransaction.title') }}</h3>
+        <form id="form" @submit.prevent="onSubmit">
+          <div class="form-control">
+            <label for="text">{{ $t('addTransaction.name') }}</label>
+            <input type="text" id="text" v-model="text" :placeholder="$t('addTransaction.name')" />
+          </div>
+          <div class="form-control">
+            <label for="amount">{{ $t('addTransaction.amount') }}</label>
+            <input type="text" id="amount" v-model="amount" :placeholder="$t('addTransaction.amount')" @input="validateAmount" :class="{ 'input-error': amountError }" />
+            <small class="help-text">{{ $t('addTransaction.amountHelp') }}</small>
+            <span v-if="amountError" class="error-message">{{ $t('addTransaction.errorMessage') }}</span>
+          </div>
+          <div class="form-control">
+            <label for="date">{{ $t('addTransaction.date') }}</label>
+            <input type="date" id="date" v-model="date" />
+          </div>
+            <button class="btn">{{ $t('addTransaction.addButton') }}</button>
+            <button type="button" class="btn btn-close" @click="closeModal">{{ $t('addTransaction.closeButton') }}</button>
+          </form>
+        </div>
+      </div>
+    </template>
+
+-----------------------------------------------------------------------------------
+
+# 7. EditTransaction.vue
+O componente EditTransaction.vue permite ao usuário editar uma transação existente.
+
+### Código do EditTransaction.vue
+
+    <template>
+      <div v-if="isVisible" class="modal-overlay" @click="close">
+        <div class="modal" @click.stop>
+          <h3>{{ $t('editTransaction.title') }}</h3>
+          <form id="form" @submit.prevent="onSubmit">
+            <div class="form-control">
+              <label for="text">{{ $t('addTransaction.name') }}</label>
+              <input type="text" id="text" v-model="text" :placeholder="$t('addTransaction.name')" />
+            </div>
+          <div class="form-control">
+            <label for="amount">{{ $t('addTransaction.amount') }}</label>
+            <input type="text" id="amount" v-model="amount" :placeholder="$t('addTransaction.amount')" @input="validateAmount" :class="{ 'input-error': amountError }" />
+            <small class="help-text">{{ $t('addTransaction.amountHelp') }}</small>
+            <span v-if="amountError" class="error-message">{{ $t('addTransaction.errorMessage') }}</span>
+          </div>
+          <div class="form-control">
+            <label for="date">{{ $t('addTransaction.date') }}</label>
+            <input type="date" id="date" v-model="date" />
+          </div>
+            <button class="btn">{{ $t('editTransaction.updateButton') }}</button>
+            <button type="button" class="btn btn-close" @click="close">{{ $t('editTransaction.closeButton') }}</button>
+          </form>
+        </div>
+      </div>
+    </template>
+
+-----------------------------------------------------------------------------------
+
+# 8. Filters.vue
+O componente Filters.vue permite ao usuário filtrar as transações por data ou valor.
+
+### Código do Filters.vue
+
+    <template>
+      <div class="filters" v-if="isVisible">
+        <select v-model="sortBy">
+          <option value="date">{{ $t('filters.sortByDate') }}</option>
+          <option value="amount">{{ $t('filters.sortByAmount') }}</option>
+        </select>
+      </div>
+    </template>
+
+-----------------------------------------------------------------------------------
+
+# 9. PeriodFilter.vue
+O componente PeriodFilter.vue permite ao usuário filtrar as transações por período (todos, por ano ou por mês).
+
+### Código do PeriodFilter.vue
+
+    <template>
+      <div class="period-filter">
+        <select v-model="selectedFilter" id="period">
+          <option value="all">{{ $t('periodFilter.allPeriod') }}</option>
+          <option value="year">{{ $t('periodFilter.byYear') }}</option>
+          <option value="month">{{ $t('periodFilter.byMonth') }}</option>
+        </select>
+
+        <div v-if="selectedFilter === 'year'" class="filter-options">
+          <select v-model="selectedYear" id="year">
+            <option v-for="year in uniqueYears" :key="year" :value="year">
+              {{ year }}
+            </option>
+          </select>
+        </div>
+
+        <div v-if="selectedFilter === 'month'" class="filter-options">
+          <select v-model="selectedYear" id="year">
+            <option v-for="year in uniqueYears" :key="year" :value="year">
+              {{ year }}
+            </option>
+          </select>
+
+          <select v-model="selectedMonth" id="month">
+            <option v-for="(monthName, index) in months" :key="index" :value="index + 1">
+              {{ $t(`months.${monthName}`) }}
+            </option>
+          </select>
+        </div>
+      </div>
+    </template>
+
+-----------------------------------------------------------------------------------
+
+# 10. Calculator.vue
+O componente Calculator.vue fornece uma calculadora embutida para cálculos rápidos.
+
+### Código do Calculator.vue
+
+    <template>
+      <div>
+        <button @click="toggleCalculator" class="calculator-toggle-btn">
+          <v-icon name="bi-calculator-fill" scale="1.5" />
+        </button>
+
+      <div class="calculator-widget" :class="{ expanded: isExpanded }">
+        <div class="display">{{ currentInput || '0' }}</div>
+          <div class="buttons">
+            <button @click="clear">C</button>
+            <button @click="appendOperator('/')">/</button>
+            <button @click="appendOperator('*')">*</button>
+            <button @click="removeLast">←</button>
+            <button @click="appendNumber('7')">7</button>
+            <button @click="appendNumber('8')">8</button>
+            <button @click="appendNumber('9')">9</button>
+            <button @click="appendOperator('-')">-</button>
+            <button @click="appendNumber('4')">4</button>
+            <button @click="appendNumber('5')">5</button>
+            <button @click="appendNumber('6')">6</button>
+            <button @click="appendOperator('+')">+</button>
+            <button @click="appendNumber('1')">1</button>
+            <button @click="appendNumber('2')">2</button>
+            <button @click="appendNumber('3')">3</button>
+            <button @click="appendNumber('.')">.</button>
+            <button @click="calculate" class="equals">=</button>
+            <button @click="appendNumber('0')" class="zero">0</button>
+          </div>
+        </div>
+      </div>
+    </template>
+
+-----------------------------------------------------------------------------------
+
+# 11. ConsentBanner.vue
+O componente ConsentBanner.vue exibe um banner de consentimento para a política de privacidade.
+
+### Código do ConsentBanner.vue
+
+    <template>
+      <div v-if="showBanner" class="consent-banner">
+        <p>{{ $t('consent.message') }}</p>
+        <button @click="acceptConsent" class="btn">{{ $t('consent.acceptButton') }}</button>
+      </div>
+    </template>
+
+-----------------------------------------------------------------------------------
+
+# 12. Loader.vue
+O componente Loader.vue exibe um indicador de carregamento enquanto o aplicativo está processando dados.
+
+### Código do Loader.vue
+
+    <template>
+      <div class="loader"></div>
+    </template>
+
+-----------------------------------------------------------------------------------
+
+### Para mais detalhes, consulte o código-fonte e os comentários no repositório do GitHub.
+
+-----------------------------------------------------------------------------------
+
+Se precisar entrar em contato comigo, pode encontrar pelos meios de comunicação abaixo:
+
+    e-Mail: gustavo.dev97@gmail.com
+
+    GitHub: github.com/Gustav-dev97
+
+Muito Obrigado! :)    
