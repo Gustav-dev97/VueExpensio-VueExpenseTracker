@@ -3,9 +3,18 @@ O VuExpensio é um aplicativo de gerenciamento de despesas e receitas desenvolvi
 
 -----------------------------------------------------------------------------------
 
+Para executar o projeto: 
+
+    npm install
+    npm run dev
+
+-----------------------------------------------------------------------------------
+
 # Estrutura do Projeto
 
-O projeto é composto por vários componentes Vue.js, cada um responsável por uma parte específica da funcionalidade do aplicativo. Abaixo está uma visão geral dos principais componentes e suas responsabilidades:
+O projeto é composto por vários componentes Vue.js, cada um responsável por uma parte específica da funcionalidade do site. Abaixo está uma visão geral dos principais componentes e suas responsabilidades:
+
+### OBS: O código javascript foi comentado de forma explicativa, caso o contrário esse README ficaria muito longo, mas aqui você encontra uma mapa do que cada arquivo faz bem como a explicação dos templates
 
 -----------------------------------------------------------------------------------
 
