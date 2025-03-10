@@ -12,7 +12,7 @@ O projeto é composto por vários componentes Vue.js, cada um responsável por u
 ## 1. **App.vue**
 O arquivo `App.vue` é o componente principal do aplicativo. Ele gerencia o estado global, incluindo a lista de transações, filtros, modais, e a lógica de exportação de dados.
 
-### Código do App.vue
+### Template do App.vue
 
     <template>
       <Loader v-if="isLoading" />
@@ -70,7 +70,7 @@ Os estilos são definidos no final do arquivo e incluem classes para o layout, b
 # 2. Header.vue
 O componente Header.vue é responsável pelo cabeçalho do aplicativo, que inclui o título e um seletor de idioma.
 
-### Código do Header.vue
+### Template do Header.vue
 
     <template>
       <header class="header">
@@ -100,7 +100,7 @@ O script gerencia a lógica para alternar entre os idiomas e exibir o menu suspe
 # 3. Dashboard.vue
 O componente Dashboard.vue exibe um resumo financeiro, incluindo receitas totais, despesas totais e saldo líquido.
 
-### Código do Dashboard.vue
+### Template do Dashboard.vue
 
     <template>
       <div class="dashboard">
@@ -132,7 +132,7 @@ O script calcula os valores totais com base nas transações atuais.
 # 4. ExpenseChart.vue
 O componente ExpenseChart.vue exibe gráficos de barras e de pizza para visualizar as transações.
 
-### Código do ExpenseChart.vue
+### Template do ExpenseChart.vue
 
     <template>
       <div class="charts-wrapper">
@@ -156,7 +156,7 @@ O script gerencia a lógica para renderizar e atualizar os gráficos com base na
 # 5. TransactionList.vue
 O componente TransactionList.vue lista todas as transações, permitindo ao usuário editar ou excluir cada uma.
 
-### Código do TransactionList.vue
+### Template do TransactionList.vue
 
     <template>
       <h3 class="transactions-title">{{ $t('transactionList.title') }}</h3>
@@ -190,7 +190,7 @@ O script gerencia a lógica para editar e excluir transações.
 # 6. AddTransaction.vue
 O componente AddTransaction.vue permite ao usuário adicionar uma nova transação.
 
-### Código do AddTransaction.vue
+### Template do AddTransaction.vue
 
     <template>
       <button @click="openModal" class="add-transaction-btn">
@@ -235,7 +235,7 @@ O script gerencia a lógica para validar e adicionar a transação.
 # 7. EditTransaction.vue
 O componente EditTransaction.vue permite ao usuário editar uma transação existente.
 
-### Código do EditTransaction.vue
+### Template do EditTransaction.vue
 
     <template>
       <div v-if="isVisible" class="modal-overlay" @click="close">
@@ -276,7 +276,7 @@ O script gerencia a lógica para validar e atualizar a transação.
 # 8. Filters.vue
 O componente Filters.vue permite ao usuário filtrar as transações por data ou valor.
 
-### Código do Filters.vue
+### Template do Filters.vue
 
     <template>
       <div class="filters" v-if="isVisible">
@@ -298,7 +298,7 @@ O script gerencia a lógica para filtrar as transações com base na opção sel
 # 9. PeriodFilter.vue
 O componente PeriodFilter.vue permite ao usuário filtrar as transações por período (todos, por ano ou por mês).
 
-### Código do PeriodFilter.vue
+### Template do PeriodFilter.vue
 
     <template>
       <div class="period-filter">
@@ -343,7 +343,7 @@ O script gerencia a lógica para filtrar as transações com base no período se
 # 10. Calculator.vue
 O componente Calculator.vue fornece uma calculadora embutida para cálculos rápidos.
 
-### Código do Calculator.vue
+### Template do Calculator.vue
 
     <template>
       <div>
@@ -388,7 +388,7 @@ O script gerencia a lógica para realizar cálculos e exibir o resultado.
 # 11. ConsentBanner.vue
 O componente ConsentBanner.vue exibe um banner de consentimento para a política de privacidade.
 
-### Código do ConsentBanner.vue
+### Template do ConsentBanner.vue
 
     <template>
       <div v-if="showBanner" class="consent-banner">
@@ -408,7 +408,7 @@ O script gerencia a lógica para exibir o banner e armazenar a preferência do u
 # 12. Loader.vue
 O componente Loader.vue exibe um indicador de carregamento enquanto o aplicativo está processando dados.
 
-### Código do Loader.vue
+### Template do Loader.vue
 
     <template>
       <div class="loader"></div>
