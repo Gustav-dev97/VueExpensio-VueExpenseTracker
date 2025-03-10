@@ -50,6 +50,21 @@ O arquivo `App.vue` é o componente principal do aplicativo. Ele gerencia o esta
       </div>
     </template>
 
+### Template:
+O template do App.vue define a estrutura do aplicativo, incluindo o cabeçalho, o conteúdo principal, e o rodapé.
+
+Ele também inclui os componentes principais, como Header, Dashboard, ExpenseChart, TransactionList, AddTransaction, EditTransaction, Calculator, e ConsentBanner.
+
+O modal de privacidade é exibido condicionalmente com v-if="isPrivacyModalVisible".
+
+### Script:
+O script gerencia o estado global do aplicativo, incluindo a lista de transações, filtros, e modais.
+
+Ele também implementa a lógica para adicionar, editar, excluir, e exportar transações.
+
+### Estilos:
+Os estilos são definidos no final do arquivo e incluem classes para o layout, botões, modais, e outros elementos visuais.
+
 -----------------------------------------------------------------------------------
 
 # 2. Header.vue
@@ -71,6 +86,14 @@ O componente Header.vue é responsável pelo cabeçalho do aplicativo, que inclu
         </div>
       </header>
     </template>
+
+### Template:
+O template define o cabeçalho do aplicativo, que inclui o título e um botão para alternar entre os idiomas.
+
+O título é clicável e rola a página para o topo ao ser clicado.
+
+### Script: 
+O script gerencia a lógica para alternar entre os idiomas e exibir o menu suspenso.
 
 -----------------------------------------------------------------------------------
 
@@ -96,6 +119,14 @@ O componente Dashboard.vue exibe um resumo financeiro, incluindo receitas totais
       </div>
     </template>
 
+### Template:
+O template define o layout do painel de resumo financeiro, que inclui três seções: receitas totais, despesas totais, e saldo líquido.
+
+As cores são usadas para diferenciar receitas (verde) e despesas (vermelho).
+
+### Script:
+O script calcula os valores totais com base nas transações atuais.
+
 -----------------------------------------------------------------------------------
 
 # 4. ExpenseChart.vue
@@ -113,6 +144,12 @@ O componente ExpenseChart.vue exibe gráficos de barras e de pizza para visualiz
         </div>
       </div>
     </template>
+
+### Template:
+O template define o layout dos gráficos, que são renderizados usando a biblioteca Chart.js.
+
+### Script:
+O script gerencia a lógica para renderizar e atualizar os gráficos com base nas transações.    
 
 -----------------------------------------------------------------------------------
 
@@ -139,6 +176,14 @@ O componente TransactionList.vue lista todas as transações, permitindo ao usu�
         </li>
       </ul>
     </template>
+
+### Template:
+O template define a lista de transações, que inclui o nome, valor, data, e botões para editar e excluir.
+
+As cores são usadas para diferenciar receitas (verde) e despesas (vermelho).
+
+### Script:
+O script gerencia a lógica para editar e excluir transações.
 
 -----------------------------------------------------------------------------------
 
@@ -177,6 +222,14 @@ O componente AddTransaction.vue permite ao usuário adicionar uma nova transaç�
       </div>
     </template>
 
+### Template:
+O template define o formulário para adicionar uma nova transação, que inclui campos para o nome, valor, e data.
+
+O modal é exibido condicionalmente com v-if="isModalVisible".
+
+### Script:
+O script gerencia a lógica para validar e adicionar a transação.    
+
 -----------------------------------------------------------------------------------
 
 # 7. EditTransaction.vue
@@ -210,6 +263,14 @@ O componente EditTransaction.vue permite ao usuário editar uma transação exis
       </div>
     </template>
 
+### Template:
+O template define o formulário para editar uma transação existente, que é semelhante ao formulário de adição.
+
+O modal é exibido condicionalmente com v-if="isVisible".
+
+### Script:
+O script gerencia a lógica para validar e atualizar a transação.
+
 -----------------------------------------------------------------------------------
 
 # 8. Filters.vue
@@ -225,6 +286,12 @@ O componente Filters.vue permite ao usuário filtrar as transações por data ou
         </select>
       </div>
     </template>
+
+### Template:
+O template define o seletor para filtrar as transações por data ou valor.
+
+### Script:
+O script gerencia a lógica para filtrar as transações com base na opção selecionada.
 
 -----------------------------------------------------------------------------------
 
@@ -265,6 +332,12 @@ O componente PeriodFilter.vue permite ao usuário filtrar as transações por pe
       </div>
     </template>
 
+### Template:
+O template define o seletor para filtrar as transações por período (todos, por ano ou por mês).
+
+### Script:
+O script gerencia a lógica para filtrar as transações com base no período selecionado.
+
 -----------------------------------------------------------------------------------
 
 # 10. Calculator.vue
@@ -304,6 +377,12 @@ O componente Calculator.vue fornece uma calculadora embutida para cálculos ráp
       </div>
     </template>
 
+### Template:
+O template define a calculadora, que inclui um display e botões para números e operações.
+
+### Script:
+O script gerencia a lógica para realizar cálculos e exibir o resultado.
+
 -----------------------------------------------------------------------------------
 
 # 11. ConsentBanner.vue
@@ -318,6 +397,12 @@ O componente ConsentBanner.vue exibe um banner de consentimento para a política
       </div>
     </template>
 
+### Template:
+O template define o banner de consentimento, que solicita ao usuário que aceite a política de privacidade.
+
+### Script:
+O script gerencia a lógica para exibir o banner e armazenar a preferência do usuário no localStorage.
+
 -----------------------------------------------------------------------------------
 
 # 12. Loader.vue
@@ -328,6 +413,12 @@ O componente Loader.vue exibe um indicador de carregamento enquanto o aplicativo
     <template>
       <div class="loader"></div>
     </template>
+
+### Template:
+O template define o indicador de carregamento, que é exibido quando o estado isLoading está ativo.
+
+### Script:
+O script gerencia a lógica para exibir o indicador de carregamento.
 
 -----------------------------------------------------------------------------------
 
